@@ -13,12 +13,71 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+// Question Controller
+  late TextEditingController questionController;
+  String question = '';
+
   @override
+  void initState() {
+    super.initState();
+    questionController = TextEditingController();
+    answerController = TextEditingController();
+  }
+
+  @override
+  void Qdispose() {
+    questionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void submit() {
+    Navigator.of(context).pop(questionController.text);
+    questionController.clear();
+  }
+
+// Answer Controller
+  late TextEditingController answerController;
+  String answer = '';
+
   Widget build(BuildContext context) {
+    Future<String?> openDialog() => showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("New FlashCard"),
+              content: Container(
+                  height: 138,
+                  child: Column(children: [
+                    TextField(
+                        autofocus: true,
+                        controller: questionController,
+                        onSubmitted: (_) => submit(),
+                        decoration: InputDecoration(
+                            hintText: 'Enter the question.',
+                            labelText: 'Question',
+                            border: OutlineInputBorder())),
+                    SizedBox(height: 20),
+                    TextField(
+                        autofocus: true,
+                        controller: answerController,
+                        onSubmitted: (_) => submit(),
+                        decoration: InputDecoration(
+                            hintText: 'Enter the answer.',
+                            labelText: 'Answer',
+                            border: OutlineInputBorder()))
+                  ])),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      submit();
+                    },
+                    child: Text('Submit'))
+              ],
+            ));
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text("Flashcards", style: TextStyle(fontSize: 30)),
+          title: Text("FlashCards", style: TextStyle(fontSize: 30)),
           backgroundColor: Colors.black,
         ),
         body: Container(
@@ -46,7 +105,17 @@ class _HomeState extends State<Home> {
               Row(children: [
                 Spacer(),
                 FloatingActionButton(
-                    onPressed: () {}, child: Icon(Icons.plus_one))
+                    onPressed: () async {
+                      final question = await openDialog();
+                      if (question == null || question.isEmpty) return;
+                      setState(() => this.question = question);
+
+                      final answer = await openDialog();
+                      if (answer == null || answer.isEmpty) return;
+                      setState(() => this.answer = answer);
+                      ;
+                    },
+                    child: Icon(Icons.plus_one))
               ]),
               Spacer(),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
@@ -97,6 +166,12 @@ class Screen2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<String?> answerDialog() => showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+            title: Text("New FlashCard"),
+            content: Container(height: 138, child: Text("Answer3"))));
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -121,11 +196,11 @@ class Screen2 extends StatelessWidget {
                       margin: EdgeInsets.fromLTRB(0, 16, 0, 0),
                       child: Column(children: [
                         SizedBox(height: 10),
-                        Text("Card #1",
+                        Text("Card #3",
                             style:
                                 TextStyle(fontSize: 20, color: Colors.white)),
                         Spacer(),
-                        Text("Title",
+                        Text("Title3",
                             style:
                                 TextStyle(fontSize: 40, color: Colors.white)),
                         Spacer()
@@ -137,8 +212,14 @@ class Screen2 extends StatelessWidget {
                     height: 40,
                     width: 120,
                     child: TextButton(
-                        onPressed: () {}, child: Text("Show Answer"))),
-                Icon(Icons.navigate_next_sharp, color: Colors.white, size: 75)
+                        onPressed: () async {
+                          final answer = await answerDialog();
+                        },
+                        child: Text("Show Answer"))),
+                IconButton(
+                    onPressed: () {}, // for next random flashcard
+                    icon: Icon(Icons.navigate_next_sharp,
+                        color: Colors.white, size: 75))
               ]),
               Spacer(),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
