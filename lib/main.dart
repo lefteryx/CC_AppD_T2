@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 // Question Controller
   late TextEditingController questionController;
-  String question = '';
+List<String> question = [];
 
   @override
   void initState() {
@@ -38,7 +38,8 @@ class _HomeState extends State<Home> {
 
 // Answer Controller
   late TextEditingController answerController;
-  String answer = '';
+List<String> answer = [];
+List<Widget> dynamicList = [];
 
   Widget build(BuildContext context) {
     Future<String?> openDialog() => showDialog<String>(
@@ -92,27 +93,26 @@ class _HomeState extends State<Home> {
               ),
               Container(
                   height: 400,
-                  child: GridView.count(
-                      crossAxisCount: 2,
+                  child: GridView.builder(
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
-                      children: [
-                        flashCard(),
-                        flashCard(),
-                        flashCard(),
-                        flashCard(),
-                      ])),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2
+                      )
+                      itemCount: dynamicList.length,
+                      itemBuilder: (_, index) => dynamicList[index])),
+
               Row(children: [
                 Spacer(),
                 FloatingActionButton(
                     onPressed: () async {
                       final question = await openDialog();
                       if (question == null || question.isEmpty) return;
-                      setState(() => this.question = question);
+                      setState(() => question.add(questionController.text);
 
                       final answer = await openDialog();
                       if (answer == null || answer.isEmpty) return;
-                      setState(() => this.answer = answer);
+                      setState(() => answer.add(answerController.text);
                       ;
                     },
                     child: Icon(Icons.plus_one))
